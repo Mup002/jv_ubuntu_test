@@ -4,7 +4,7 @@ services:
     image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: 1234
-      MYSQL_DATABASE: 105
+      MYSQL_DATABASE: lib
     ports:
       - "3307:3306"
     healthcheck:
@@ -33,6 +33,9 @@ services:
         condition: service_healthy
     volumes:
       - ./logs:/app/logs
+      - ./src:/app/src
+      - ./pom.xml:/app/pom.xml
+    command: mvn spring-boot:run -Dspring-boot.devtools.restart.enabled=true
     networks:
       - app-network
   phpmyadmin:
@@ -52,6 +55,23 @@ services:
     image: redis:latest
     ports:
       - "6379:6379"
+    networks:
+      - app-network
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - app-network
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: 1234
     networks:
       - app-network
 networks:
